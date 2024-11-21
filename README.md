@@ -1,2 +1,42 @@
 # PovertyMap_IDN
 A very simple R practice of mapping poverty rate based on Indonesian provinces
+
+#i used ChatGPT to help of course
+
+##Learning to create map in R
+#first trial: the Indonesian map of poverty
+
+#change the working directory
+setwd("C:\Users\brend\Documents\Data analytics\R\For portfolio")
+
+#load the necessary packages
+library(sf)
+library(ggplot2)
+library(dplyr)
+library(viridis)
+library(readxl)
+
+#load the map data into R
+indonesia_map <- st_read("Indonesian map/gadm41_IDN_1.shp")
+
+#load the poverty rate data
+poverty_data <- read_excel("PovertyRate.xlsx")
+
+#check if the province names in both datasets match
+unique(indonesia_map$NAME_1)
+unique(poverty_data$province)
+#if ok, proceed to merging
+
+#merge the map data with the poverty data
+indonesia_map <- indonesia_map %>% 
+  left_join(poverty_data, by = c("NAME_1" = "province"))
+
+#use ggplot to create a map, coloring each province according to its poverty rate
+ggplot(data = indonesia_map)+
+  geom_sf(aes(fill = poverty))+
+  scale_fill_viridis_c(option = "plasma", na.value = "grey90")+
+  theme_minimal()+
+  labs(
+    title = "Poverty Rate by Province in Indonesia",
+    fill = "Poverty Rate (%)"
+  )
